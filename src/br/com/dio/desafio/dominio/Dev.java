@@ -2,10 +2,12 @@ package br.com.dio.desafio.dominio;
 
 import java.util.*;
 
-public class Dev {
+public class Dev{
     private String nome;
     private Set<Conteudo> conteudosInscritos = new LinkedHashSet<>();
     private Set<Conteudo> conteudosConcluidos = new LinkedHashSet<>();
+
+    Coracoes coracoes = new Coracoes();
 
     public void inscreverBootcamp(Bootcamp bootcamp){
         this.conteudosInscritos.addAll(bootcamp.getConteudos());
@@ -17,6 +19,7 @@ public class Dev {
         if(conteudo.isPresent()) {
             this.conteudosConcluidos.add(conteudo.get());
             this.conteudosInscritos.remove(conteudo.get());
+            coracoes.restaurarCoracoes();
         } else {
             System.err.println("Você não está matriculado em nenhum conteúdo!");
         }
@@ -29,14 +32,26 @@ public class Dev {
             double next = iterator.next().calcularXp();
             soma += next;
         }
+        soma += -coracoes.getQuantidadeErros() * 5;
         return soma;
-
-        /*return this.conteudosConcluidos
-                .stream()
-                .mapToDouble(Conteudo::calcularXp)
-                .sum();*/
     }
 
+    public void erroProva(){
+        if(coracoes.getQuantidadeCoracoes() < 1 ){
+            System.out.println("Tenha mais calma, procure rever o conteudo abordado\nAguarde ate ser restaurado seu coracao para a proxima tentativa");
+        } else {
+            coracoes.setQuantidadeCoracoes(coracoes.getQuantidadeCoracoes() - 1);
+            coracoes.setQuantidadeErros(coracoes.getQuantidadeErros() + 1);
+        }
+    }
+
+    public void restaurarCoracoesTempo(){
+        if (coracoes.getQuantidadeCoracoes() < 5){
+            coracoes.setQuantidadeCoracoes(coracoes.getQuantidadeCoracoes() + 1);
+        }else {
+            System.out.println("Boa prova, voce ja possui chance de tentar novamente");
+        }
+    }
 
     public String getNome() {
         return nome;
